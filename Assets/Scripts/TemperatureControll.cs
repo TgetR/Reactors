@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,6 +11,8 @@ public class TemperatureControll : MonoBehaviour
     public bool slowTemperatureRise;
     [SerializeField] private GlobalData _GlobalData;
     [SerializeField] private GameObject _Alarm;
+    [SerializeField] private Animator _Picture;
+    [SerializeField] private TMP_Text _Text;
     private RodsController _RodsController;
     private int _ActiveRods = 0;
     void Start()
@@ -21,21 +22,25 @@ public class TemperatureControll : MonoBehaviour
     }
 
     void ControlProduction()
-    {   if (Temperature  > _GlobalData.TemperatureMax + 400)
+    {   
+        if (Temperature  > _GlobalData.TemperatureMax ) _Text.text = "-Temperature maximum is exceeded \n" + _Text.text;
+        if (Temperature  > _GlobalData.TemperatureMax + 400)
         {
             SceneManager.LoadScene("GameOver");
         }
         else if (Temperature > _GlobalData.TemperatureMax)
         {
             _Alarm.SetActive(true);
+            _Picture.SetBool("Alarm",true);
         }
 
         else
         {
             _Alarm.SetActive(false);
+            _Picture.SetBool("Alarm",false);
         }
         _ActiveRods = _RodsController.ActiveRodsCount;
-        if (_ActiveRods == 0)
+        if (_ActiveRods <= 12)
         {
             Temperature = Temperature + (Temperature / 10f);
             //DynamicTemperatureRise
@@ -44,7 +49,7 @@ public class TemperatureControll : MonoBehaviour
             dynamicTemperatureRise = true;
             slowTemperatureRise = false;
         }
-        else if (_ActiveRods >= 12 && _ActiveRods < 18)
+        else if (_ActiveRods > 12 && _ActiveRods < 18)
         {
             Temperature = Temperature + (Temperature / 20f);
             //SlowTemperatureRise
@@ -60,7 +65,7 @@ public class TemperatureControll : MonoBehaviour
             dynamicTemperatureRise = false;
             slowTemperatureRise = false;
         }
-        else if (_ActiveRods >= 18 && _ActiveRods < 30)
+        else if (_ActiveRods > 18 && _ActiveRods < 30)
         {
             Temperature = Temperature - (Temperature / 20f);
             //SlowTemperatureReduction
